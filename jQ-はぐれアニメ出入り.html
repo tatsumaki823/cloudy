@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="jquery-3.2.1.min.js"></script>
+  <style>
+    #imgList {
+      list-style: none;
+    }
+    #imgList > li > img{
+      float: left;
+      width:  80px;
+      height: 80px;
+    }
+  </style>
+  <script>
+    $(function(){
+      $('#activeImg').attr('src',$('#imgList > li > img').attr('src'));
+
+      $('#imgList img').click(function(){
+        let nextImg = $(this);
+        $('#activeImg')
+          .hide(500, function(){
+            $(this).attr('src',nextImg.attr('src'))
+          })
+          .show(500);
+      })
+    });
+  </script>
+</head>
+<body>
+  <p>
+  <ul id='imgList'>
+    <li><img src="images/hagure.jpg"></li>
+    <li><img src="images/hagure2.png"></li>
+  </ul>
+  </p>
+  <br><br><br><br>
+  <p>
+    <img id='activeImg'></img>
+  </p>
+</body>
+</html>
