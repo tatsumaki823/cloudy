@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <link type="text/css" rel="stylesheet" href="stylesheet.css"/>
+  <script   src="https://code.jquery.com/jquery-3.2.1.slim.js"   integrity="sha256-tA8y0XqiwnpwmOIl3SGAcFl2RvxHjA8qp0+1uCGmRmg="   crossorigin="anonymous"></script>
+  <script>
+    let TYPE_BLOCK = "TYPE_BLOCK";
+    let MOVE_DOWN = "MOVE_DOWN";
+    let MOVE_LEFT = "MOVE_LEFT";
+    let MOVE_RIGHT = "MOVE_RIGHT";
+    let SCREEN_WIDTH = 4;
+    let SCREEN_HEIGHT = 5;
+    let b = null;
+    let intervalTime = 1000;
+
+    $(function(){
+        //初期初期
+        init();
+
+        //開始
+        var timer = window.setInterval(function(){
+            nextFrame();
+        }, intervalTime);
+    });
+
+    // 初期処理
+    function init(){
+        // 領域作成
+        var tbl = $('#area');
+        tbl.append('<table border="1">');
+        for( var i = 0; i < SCREEN_HEIGHT; i++){
+           var tblTr = $('<tr></tr>').appendTo(tbl);
+           for(var j = 0; j < SCREEN_WIDTH; j++){
+                var data = "";
+                // Bottom Wall
+                if(i === SCREEN_HEIGHT - 1){
+                    data += ' data-type="TYPE_WALL"';
+                }
+                // Side Wall
+                if(j === 0 || j === SCREEN_WIDTH - 1 ){
+                    data += ' data-type="TYPE_WALL"';
+                }
+                $('<td' + data + '></td>').appendTo(tblTr);
+           }
+        }
+
+        // キーイベントリスナ登録
+        keyEvent();
+
+        // 初期配置
+        setNewBlock();
+    }
+
+    // 次回
+    function setNewBlock(){
+        b = $('#area > tr:eq(0) > td:eq(2)');
+        b.attr("data-type",TYPE_BLOCK);
+    }
+    
+    //キーイベントリスナ
+    function keyEvent(){
+        $(window).keydown(function(e){
+            if(e.which === 37){
+                move(b, MOVE_LEFT);
+                // $('#status').text(e.which + ": Left is pressed");
+            }
+            if(e.which === 39){
+                move(b, MOVE_RIGHT);
+                // $('#status').text(e.which + ": Right is pressed");
+            }
+            if(e.which === 40){
+                move(b, MOVE_DOWN);
+                // $('#status').text(e.which + ": Down is pressed.");
+            }
+        });
+    }
+
+    //移動
+    function move(block, direction){
+        switch(direction){
+            case MOVE_LEFT:
+                if(isMovable(block, MOVE_LEFT)){
+                    block.removeAttr('data-type');
+                    b = block.prev();
+                    b.attr("data-type",TYPE_BLOCK);
+                }
+                break;
+            case MOVE_RIGHT:
+                if(isMovable(block, MOVE_RIGHT)){
+                    block.removeAttr('data-type');
+                    b = block.next();
+                    b.attr("data-type",TYPE_BLOCK);
+                }
+                break;
+            case MOVE_DOWN:
+                if(isMovable(block, MOVE_DOWN)){
+                    block.removeAttr('data-type');
+                    b = block.parent().next().children().eq(block.index());
+                    b.attr("data-type",TYPE_BLOCK);
+                }
+                break;
+        }
+    }
+
+    // 次フレーム
+    function nextFrame(){
+    
+        if(isMovable(b, MOVE_DOWN)){
+            //１つ下がる
+            b.removeAttr('data-type');
+            b = b.parent().next().children().eq(b.index());
+            b.attr("data-type",TYPE_BLOCK);
+        }else{
+            //新規開始
+            deleteLines();
+            setNewBlock();
+        }
+    }
+
+    // 行削除判定
+    function deleteLines(){
+        for(var i = 0; i < SCREEN_HEIGHT; i++){
+            var checkRow = $('tr:nth-last-child('+i+') > td[data-type="'+TYPE_BLOCK+'"]');
+            if(checkRow.length === SCREEN_WIDTH - 2){
+                // 行削除
+                $('tr:nth-last-child('+i+')').remove();
+
+                // 空行追加
+                // $('#area').prepend('<tr><td></td><td></td><td></td><td></td></tr>');
+                // $('#area > tr:first').text("ok");
+                $('#area > tr:first').clone(true).insertAfter($('#area > tr:first'));
+                // $('#area').prepend(templateRow);
+            }
+        }
+    }
+
+    // 可動判定
+    function isMovable(b, direction){
+        if (direction === MOVE_DOWN){
+            var nextPosition = b.parent().next().children().eq(b.index());
+            if(nextPosition.attr("data-type") === undefined){
+                return true;
+            }
+        }
+        if (direction === MOVE_LEFT){
+            var nextPosition = b.prev();
+            if(nextPosition.attr("data-type") === undefined){
+                return true;
+            }
+        }
+        if (direction === MOVE_RIGHT){
+            var nextPosition = b.next();
+            if(nextPosition.attr("data-type") === undefined){
+                return true;
+            }
+        }
+        return false;
+    }
+
+  </script>
+</head>
+<body>
+  <input type="button" id="btn1" value="click"/><br />
+  <span id='status'>Hello World</span><br />
+  <div id='area'></div>
+</body>
+</html>

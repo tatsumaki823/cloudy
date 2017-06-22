@@ -1,0 +1,18 @@
+table, tr, td {
+    border : 1px solid #EEE;
+    border-collapse: collapse;
+}
+td{
+    width  : 22px;
+    height : 20px;
+}
+
+/* TYPE_BLOCK */
+td[data-type="TYPE_BLOCK"] {
+    background-color : #DDF;
+}
+
+/* TYPE_WALL */
+td[data-type="TYPE_WALL"] {
+    background-color : #EEE;
+}
